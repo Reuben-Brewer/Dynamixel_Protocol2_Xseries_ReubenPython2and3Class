@@ -1,14 +1,14 @@
 ########################  
 Reuben Brewer
-reuben.brewer@gmail.comwww.reubotics.com
+reuben.brewer@gmail.com
+www.reubotics.com
 
 Apache 2 License
 
-Software Revision A, 04/06/2021
-
-Python 2.7 only (Python 3 support to come in the future).
+Software Revision C, 05/28/2021
 
 Verified working on: 
+Python 2.7 and 3.7.
 Windows 8.1 64-bit
 Raspberry Pi Buster 
 (no Mac testing yet)
@@ -103,7 +103,7 @@ cp libftd2xx.* /usr/local/lib
 chmod 0755 /usr/local/lib/libftd2xx.so.1.4.6
 ln -sf /usr/local/lib/libftd2xx.so.1.4.6 /usr/local/lib/libftd2xx.so
 exit
-THIS LAST STEP ISNíT IN THE READ ME BUT IS CRITICAL: ìsudo ldconfigî so that your code can find the new library.
+THIS LAST STEP ISN‚ÄôT IN THE READ ME BUT IS CRITICAL: ‚Äúsudo ldconfig‚Äù so that your code can find the new library.
 ###
 
 
