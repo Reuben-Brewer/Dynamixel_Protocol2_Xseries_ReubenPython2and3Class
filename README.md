@@ -31,6 +31,7 @@ you won't be able to receive any updates from motors (but the motors themselves 
 ########################  
 
 ########################### Installation instructions
+
 This code isn't "installed" like a typical python module (no "pip install MyModule"). If you want to call it in your own code, you'll need to import a local copy of the files.
 
 ###
