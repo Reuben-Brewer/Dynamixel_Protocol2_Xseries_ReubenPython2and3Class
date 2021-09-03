@@ -1,9 +1,11 @@
-# Dynamixel_Protocol2_Xseries_ReubenPython2and3Class
+
 Dynamixel_Protocol2_Xseries_ReubenPython2and3Class
 
 ########################  
-Reuben Brewer
+Reuben Brewer, Ph.D.
+
 reuben.brewer@gmail.com
+
 www.reubotics.com
 
 Apache 2 License
