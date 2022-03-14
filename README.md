@@ -122,9 +122,9 @@ sudo gedit /usr/local/lib/python3.7/dist-packages/ftd2xx/ftd2xx.py
 
 Add the lines:
 
-"elif sys.platform == 'linux':
+elif sys.platform == 'linux':
     
-	from . import _ftd2xx_linux as _ft"
+	from . import _ftd2xx_linux as _ft
 	
 right before the linux2 line (otherwise it breaks when run in Python 3).
 Alternatively, you can copy Reuben's version of this file (ftd2xx_ReubenModified.py) to /usr/local/lib/python3.7/dist-packages/ftd2xx/ftd2xx.py.
