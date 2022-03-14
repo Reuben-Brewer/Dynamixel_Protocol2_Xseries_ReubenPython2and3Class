@@ -27,8 +27,11 @@ Raspberry Pi Buster
 This code works ONLY for Dynamixel's Protocol 2 (X series and possibly some other series).
 
 To use this code, you'll need to find the unique Serial Number for your U2D2, following the instructions in the included image "FindingTheSerialNumberOfU2D2inWindows.png".
+
 When instantiating the class obect via Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(DYNAMIXEL_X_setup_dict),
+
 EACH INPUT LIST MUST BE THE SAME LENGTH AS THE NUMBER OF MOTORS, AND
+
 EACH MOTOR'S NUMERICAL ID MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
 
 You will also need to configure your Dynamixel motor (including Motor ID and Baud Rate) within R+Manager.exe (downloaded from the Robotis website).
