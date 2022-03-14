@@ -1,3 +1,7 @@
+echo "Reuben Brewer, Ph.D., reuben.brewer@gmail.com, www.reubotics.com"
+echo "Apache 2 License, Software Revision D, 03/13/2022"
+echo "Verified working on Raspberry Pi Buster"
+
 echo "Running script: $0" #First argv is the namne of the shell script
 
 NumberOfARGVarguments=$#

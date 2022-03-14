@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 
 '''
-Reuben Brewer, reuben.brewer@gmail.com, www.reubotics.com
-Apache 2 License
-Software Revision C, 05/28/2021
+Reuben Brewer, Ph.D.
+reuben.brewer@gmail.com
+www.reubotics.com
 
-Verified working on: Python 2.7 and 3.7 for Windows 8.1 64-bit and Raspberry Pi Buster (no Mac testing yet).
+Apache 2 License
+Software Revision D, 03/13/2022
+
+Verified working on: Python 2.7, 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
 
 __author__ = 'reuben.brewer'
 
 from Dynamixel_Protocol2_Xseries_ReubenPython2and3Class import *
-from MyPrintReubenPython2and3Class import *
+from MyPrint_ReubenPython2and3Class import *
 
 import os, sys, platform
 import time, datetime
@@ -36,6 +39,14 @@ else:
     from future.builtins import input as input #"sudo pip3 install future" (Python 3) AND "sudo pip install future" (Python 2)
 ###############
 
+###############
+import platform
+if platform.system() == "Windows":
+    import ctypes
+    winmm = ctypes.WinDLL('winmm')
+    winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
+###############
+
 ##########################################################################################################
 ##########################################################################################################
 def getPreciseSecondsTimeStampString():
@@ -48,11 +59,11 @@ def getPreciseSecondsTimeStampString():
 ##########################################################################################################
 ##########################################################################################################
 def TestButtonResponse():
-    global MyPrintReubenPython2and3ClassObject
+    global MyPrint_ReubenPython2and3ClassObject
     global USE_MYPRINT_FLAG
 
     if USE_MYPRINT_FLAG == 1:
-        MyPrintReubenPython2and3ClassObject.my_print("Test Button was Pressed!")
+        MyPrint_ReubenPython2and3ClassObject.my_print("Test Button was Pressed!")
     else:
         print("Test Button was Pressed!")
 ##########################################################################################################
@@ -70,7 +81,7 @@ def GUI_update_clock():
     global DYNAMIXEL_X_OPEN_FLAG
     global SHOW_IN_GUI_DYNAMIXEL_X_FLAG
 
-    global MyPrintReubenPython2and3ClassObject
+    global MyPrint_ReubenPython2and3ClassObject
     global MYPRINT_OPEN_FLAG
     global SHOW_IN_GUI_MYPRINT_FLAG
 
@@ -86,7 +97,7 @@ def GUI_update_clock():
 
             #########################################################
             if MYPRINT_OPEN_FLAG == 1 and SHOW_IN_GUI_MYPRINT_FLAG == 1:
-                MyPrintReubenPython2and3ClassObject.GUI_update_clock()
+                MyPrint_ReubenPython2and3ClassObject.GUI_update_clock()
             #########################################################
 
             root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
@@ -99,35 +110,11 @@ def GUI_update_clock():
 ##########################################################################################################
 ##########################################################################################################
 def ExitProgram_Callback():
-    global root
     global EXIT_PROGRAM_FLAG
-    global GUI_RootAfterCallbackInterval_Milliseconds
 
-    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject
-    global DYNAMIXEL_X_OPEN_FLAG
-
-    global MyPrintReubenPython2and3ClassObject
-    global MYPRINT_OPEN_FLAG
-
-    print("Exiting all threads in test_program_for_MyPrintReubenPython2and3Class.")
+    print("ExitProgram_Callback event fired!")
 
     EXIT_PROGRAM_FLAG = 1
-
-    #########################################################
-    if DYNAMIXEL_X_OPEN_FLAG == 1:
-        Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject.ExitProgram_Callback()
-    #########################################################
-
-    #########################################################
-    if MYPRINT_OPEN_FLAG == 1:
-        MyPrintReubenPython2and3ClassObject.ExitProgram_Callback()
-    #########################################################
-
-    #########################################################
-    root.quit() #Stop the GUI thread
-    root.destroy() #Close down the GUI thread
-    #########################################################
-
 ##########################################################################################################
 ##########################################################################################################
 
@@ -143,12 +130,22 @@ def GUI_Thread():
     #################################################
     #################################################
 
+    #################################################
     TestButton = Button(root, text='Test Button', state="normal", width=20, command=lambda i=1: TestButtonResponse())
     TestButton.grid(row=0, column=0, padx=5, pady=1)
+    #################################################
 
+    #################################################
     root.protocol("WM_DELETE_WINDOW", ExitProgram_Callback)  # Set the callback function for when the window's closed.
     root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
     root.mainloop()
+    #################################################
+
+    #################################################
+    root.quit() #Stop the GUI thread, MUST BE CALLED FROM GUI_Thread
+    root.destroy() #Close down the GUI thread, MUST BE CALLED FROM GUI_Thread
+    #################################################
+
 ##########################################################################################################
 ##########################################################################################################
 
@@ -190,6 +187,12 @@ if __name__ == '__main__':
     
     global USE_MYPRINT_FLAG
     USE_MYPRINT_FLAG = 1
+    
+    global USE_DYNAMIXEL_POSITION_CONTROL_FLAG
+    USE_DYNAMIXEL_POSITION_CONTROL_FLAG = 1 #SET TO 0 FOR VELOCITY CONTROL
+
+    global USE_DYNAMIXEL_SINUSOIDAL_INPUT_FLAG
+    USE_DYNAMIXEL_SINUSOIDAL_INPUT_FLAG = 1
     #################################################
     #################################################
 
@@ -240,26 +243,66 @@ if __name__ == '__main__':
     global EXIT_PROGRAM_FLAG
     EXIT_PROGRAM_FLAG = 0
 
+    global CurrentTime_MainLoopThread
+    CurrentTime_MainLoopThread = -11111.0
+
+    global StartingTime_MainLoopThread
+    StartingTime_MainLoopThread = -11111.0
+
+    global SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle
+    SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle = 2.0
+
+    global SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl
+    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl = 0.0
+
+    global SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl
+    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl = 90.0
+
+    global SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl
+    SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl = -1.0
+
+    global SINUSOIDAL_MOTION_INPUT_MaxValue_VelocityControl
+    SINUSOIDAL_MOTION_INPUT_MaxValue_VelocityControl = 1.0
+
     global root
 
     global GUI_RootAfterCallbackInterval_Milliseconds
     GUI_RootAfterCallbackInterval_Milliseconds = 30
+    #################################################
+    #################################################
 
+    #################################################
+    #################################################
     global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject
 
     global DYNAMIXEL_X_OPEN_FLAG
     DYNAMIXEL_X_OPEN_FLAG = -1
 
-    global MyPrintReubenPython2and3ClassObject
+    global DynamixelList_TestChannelsList
+    DynamixelList_TestChannelsList = [0] #Set this list to whichever motor ID's you want to test.
+
+    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict
+
+    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageCounter
+    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageCounter =  -11111.0
+
+    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTimeSeconds
+    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTimeSeconds = -11111.0
+
+    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTopic
+    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTopic = ""
+
+    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageData
+    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageData = ""
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    global MyPrint_ReubenPython2and3ClassObject
 
     global MYPRINT_OPEN_FLAG
     MYPRINT_OPEN_FLAG = -1
-
-    global MainLoopThread_current_time
-    MainLoopThread_current_time = -11111
-
-    global MainLoopThread_starting_time
-    MainLoopThread_starting_time = -11111
     #################################################
     #################################################
 
@@ -278,21 +321,7 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict
-
-    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageCounter
-    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageCounter =  -11111.0
-
-    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTimeSeconds
-    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTimeSeconds = -11111.0
-
-    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTopic
-    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageTopic = ""
-
-    global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageData
-    Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageData = ""
-
-
+    global DYNAMIXEL_X_GUIparametersDict
     DYNAMIXEL_X_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_DYNAMIXEL_X_FLAG),
                                     ("root", root),
                                     ("EnableInternal_MyPrint_Flag", 1),
@@ -305,25 +334,26 @@ if __name__ == '__main__':
                                     ("GUI_ROWSPAN", GUI_ROWSPAN_DYNAMIXEL_X),
                                     ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_DYNAMIXEL_X)])
 
-    DYNAMIXEL_X_setup_dict = dict([("SerialNumber", "FT3M9STOA"), #AlexB = FT2GXC48A
+    global DYNAMIXEL_X_setup_dict
+    DYNAMIXEL_X_setup_dict = dict([("SerialNumber", "FT3M9STOA"), #Change to the serial number of your unique device
                                     ("NameForU2D2UserProvided", "Example Name U2D2"),
                                     ("SerialBaudRate", 4000000),
                                     ("ENABLE_GETS", 1),
                                     ("ENABLE_SETS", 1),
-                                    ("MainThread_TimeToSleepEachLoop", 0.001),
-                                    ("MotorType_StringList", ["XM540-W270-R"]),
-                                    ("ControlType_StartingValueList", ["CurrentBasedPositionControl"]),
-                                    ("Position_Deg_StartingValueList", [180.0]),
-                                    ("Position_Deg_min", [0.0]),
-                                    ("Position_Deg_max", [360.0]),
-                                    ("Current_Percent0to1_max", [0.3]),
-                                    ("StartEngagedFlag", [1]),
+                                    ("MainThread_TimeToSleepEachLoop", 0.002),
+                                    ("MotorType_StringList", ["XM540-W270-R"]*len(DynamixelList_TestChannelsList)), #EACH INPUT LIST MUST BE THE SAME LENGTH AS NUMBER OF MOTORS.
+                                    ("ControlType_StartingValueList", ["CurrentBasedPositionControl"]*len(DynamixelList_TestChannelsList)), #MOTOR ID'S MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
+                                    ("Position_Deg_StartingValueList", [150.0]*len(DynamixelList_TestChannelsList)),
+                                    ("Position_Deg_min", [0.0]*len(DynamixelList_TestChannelsList)),
+                                    ("Position_Deg_max", [300.0]*len(DynamixelList_TestChannelsList)),
+                                    ("Current_Percent0to1_max", [0.5]*len(DynamixelList_TestChannelsList)),
+                                    ("StartEngagedFlag", [1]*len(DynamixelList_TestChannelsList)),
                                     ("GUIparametersDict", DYNAMIXEL_X_GUIparametersDict)])
 
                             #("RxThread_TimeToSleepEachLoop", 0.001),
                             #("TxThread_TimeToSleepEachLoop", 0.001),
-                            #("MQTT_RxMessage_Queue_MaxSize", 1000),
-                            #("MQTT_TxMessage_Queue_MaxSize", 1000)])
+                            #("RxMessage_Queue_MaxSize", 1000),
+                            #("TxMessage_Queue_MaxSize", 1000)])
 
 
     if USE_DYNAMIXEL_X_FLAG == 1:
@@ -343,7 +373,7 @@ if __name__ == '__main__':
     #################################################
     if USE_MYPRINT_FLAG == 1:
 
-        MyPrintReubenPython2and3ClassObject_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_MYPRINT_FLAG),
+        MyPrint_ReubenPython2and3ClassObject_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_MYPRINT_FLAG),
                                                                         ("root", root),
                                                                         ("UseBorderAroundThisGuiObjectFlag", 0),
                                                                         ("GUI_ROW", GUI_ROW_MYPRINT),
@@ -353,20 +383,20 @@ if __name__ == '__main__':
                                                                         ("GUI_ROWSPAN", GUI_ROWSPAN_MYPRINT),
                                                                         ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_MYPRINT)])
 
-        MyPrintReubenPython2and3ClassObject_setup_dict = dict([("NumberOfPrintLines", 10),
+        MyPrint_ReubenPython2and3ClassObject_setup_dict = dict([("NumberOfPrintLines", 10),
                                                                 ("WidthOfPrintingLabel", 200),
                                                                 ("PrintToConsoleFlag", 1),
                                                                 ("LogFileNameFullPath", os.getcwd() + "//TestLog.txt"),
-                                                                ("GUIparametersDict", MyPrintReubenPython2and3ClassObject_GUIparametersDict)])
+                                                                ("GUIparametersDict", MyPrint_ReubenPython2and3ClassObject_GUIparametersDict)])
 
         try:
-            MyPrintReubenPython2and3ClassObject = MyPrintReubenPython2and3Class(MyPrintReubenPython2and3ClassObject_setup_dict)
+            MyPrint_ReubenPython2and3ClassObject = MyPrint_ReubenPython2and3Class(MyPrint_ReubenPython2and3ClassObject_setup_dict)
             time.sleep(0.25)
-            MYPRINT_OPEN_FLAG = MyPrintReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MYPRINT_OPEN_FLAG = MyPrint_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
-            print("MyPrintReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions)
+            print("MyPrint_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions)
             traceback.print_exc()
     #################################################
     #################################################
@@ -374,7 +404,7 @@ if __name__ == '__main__':
     #################################################
     #################################################
     if USE_MYPRINT_FLAG == 1 and MYPRINT_OPEN_FLAG != 1:
-        print("Failed to open MyPrintReubenPython2and3ClassObject.")
+        print("Failed to open MyPrint_ReubenPython2and3ClassObject.")
         input("Press any key (and enter) to exit.")
         sys.exit()
     #################################################
@@ -392,17 +422,18 @@ if __name__ == '__main__':
     #################################################
     #################################################
     print("Starting main loop 'test_program_for_Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_WoVa.")
-    MainLoopThread_starting_time = getPreciseSecondsTimeStampString()
+    StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
 
     while(EXIT_PROGRAM_FLAG == 0):
 
         ###################################################
-        MainLoopThread_current_time = getPreciseSecondsTimeStampString() - MainLoopThread_starting_time
+        CurrentTime_MainLoopThread = getPreciseSecondsTimeStampString() - StartingTime_MainLoopThread
         ###################################################
 
         ###################################################
         if USE_DYNAMIXEL_X_FLAG == 1:
 
+            ##################### GET's
             Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict = Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject.GetMostRecentDataDict()
 
             if "RxMessageCounter" in Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict:
@@ -414,7 +445,27 @@ if __name__ == '__main__':
 
                 if Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict_RxMessageData.lower() == "ping":
                     Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject.AddDataToBeSent(DYNAMIXEL_X_setup_dict["MQTT_Tx_topic_list"][0], "Received your message!", DYNAMIXEL_X_setup_dict["MQTT_Tx_QOS_list"][0])
+            #####################
 
+            ##################### SET's
+            time_gain = math.pi / (2.0 * SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle)
+
+            if USE_DYNAMIXEL_SINUSOIDAL_INPUT_FLAG == 1:
+
+                if USE_DYNAMIXEL_POSITION_CONTROL_FLAG == 1:
+                    SINUSOIDAL_INPUT_TO_COMMAND = (SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl + SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl)/2.0 + 0.5*abs(SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl - SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl)*math.sin(time_gain*CurrentTime_MainLoopThread)
+
+                    for DynamixelChannel in range(0, len(DynamixelList_TestChannelsList)):
+                        if DynamixelChannel in DynamixelList_TestChannelsList:
+                            Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject.SetPosition_FROM_EXTERNAL_PROGRAM(DynamixelChannel, SINUSOIDAL_INPUT_TO_COMMAND, "deg")
+
+                else:
+                    SINUSOIDAL_INPUT_TO_COMMAND = (SINUSOIDAL_MOTION_INPUT_MaxValue_VelocityControl + SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl)/2.0 + 0.5*abs(SINUSOIDAL_MOTION_INPUT_MaxValue_VelocityControl - SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl)*math.sin(time_gain*CurrentTime_MainLoopThread)
+
+                    for DynamixelChannel in range(0, len(DynamixelList_TestChannelsList)):
+                        if DynamixelChannel in DynamixelList_TestChannelsList:
+                            Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject.SetVelocity_FROM_EXTERNAL_PROGRAM(DynamixelChannel, SINUSOIDAL_INPUT_TO_COMMAND)
+            #####################
 
         else:
             time.sleep(0.005)
@@ -423,6 +474,22 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
-    print("Exiting main program 'test_program_for_Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_WoVa.")
+    ################################################# THIS IS THE EXIT ROUTINE!
+    #################################################
+    print("Exiting main program 'test_program_for_Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject.")
+
+    #################################################
+    if DYNAMIXEL_X_OPEN_FLAG == 1:
+        Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject.ExitProgram_Callback()
+    #################################################
+
+    #################################################
+    if MYPRINT_OPEN_FLAG == 1:
+        MyPrint_ReubenPython2and3ClassObject.ExitProgram_Callback()
+    #################################################
+
+    #################################################
+    #################################################
+
     ##########################################################################################################
     ##########################################################################################################

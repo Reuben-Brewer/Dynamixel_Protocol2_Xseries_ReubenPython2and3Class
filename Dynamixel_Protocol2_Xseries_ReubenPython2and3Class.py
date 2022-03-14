@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 '''
-Reuben Brewer, reuben.brewer@gmail.com, www.reubotics.com
-Apache 2 License
-Software Revision C, 05/28/2021
+Reuben Brewer, Ph.D.
+reuben.brewer@gmail.com
+www.reubotics.com
 
-Verified working on: Python 2.7 and 3.7 for Windows 8.1 64-bit and Raspberry Pi Buster (no Mac testing yet).
+Apache 2 License
+Software Revision D, 03/13/2022
+
+Verified working on: Python 2.7, 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
 
 __author__ = 'reuben.brewer'
@@ -43,6 +46,13 @@ else:
     from future.builtins import input as input
 ############### #"sudo pip3 install future" (Python 3) AND "sudo pip install future" (Python 2)
 
+###############
+import platform
+if platform.system() == "Windows":
+    import ctypes
+    winmm = ctypes.WinDLL('winmm')
+    winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
+###############
 
 ##########################################
 import serial
@@ -262,6 +272,15 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
             print("GUI_COLUMNSPAN = " + str(self.GUI_COLUMNSPAN))
             ##########################################
 
+            ##########################################
+            if "GUI_STICKY" in self.GUIparametersDict:
+                self.GUI_STICKY = str(self.GUIparametersDict["GUI_STICKY"])
+            else:
+                self.GUI_STICKY = "w"
+
+            print("GUI_STICKY = " + str(self.GUI_STICKY))
+            ##########################################
+
         else:
             self.GUIparametersDict = dict()
             self.USE_GUI_FLAG = 0
@@ -398,10 +417,11 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
         self.HasMotorEverBeenInitializedFlag = [0]*self.NumberOfMotors
 
-        self.CurrentTime_CalculatedFromMainThread = -111111111111111
-        self.LastTime_CalculatedFromMainThread = -111111111111111
-        self.DataStreamingFrequency_CalculatedFromMainThread = -1
-        self.DataStreamingDeltaT_CalculatedFromMainThread = -1
+        self.CurrentTime_CalculatedFromMainThread = -11111.0
+        self.StartingTime_CalculatedFromMainThread = -11111.0
+        self.LastTime_CalculatedFromMainThread = -11111.0
+        self.DataStreamingFrequency_CalculatedFromMainThread = -11111.0
+        self.DataStreamingDeltaT_CalculatedFromMainThread = -11111.0
         self.LoopCounter_CalculatedFromMainThread = 0
 
         self.DataStreamingFrequency_RealTimeTicksMillisecFromDynamixel = [-1]*self.NumberOfMotors
@@ -526,7 +546,7 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
                     self.MotorName_StringList.append(str(element))
             except:
                 exceptions = sys.exc_info()[0]
-                self.MyPrint_WithoutLogFile("MotorName_StringList coldn't convert to string, Exceptions: %s" % exceptions, 0)
+                self.MyPrint_WithoutLogFile("MotorName_StringList coldn't convert to string, Exceptions: %s" % exceptions)
                 self.MotorName_StringList = [""] * self.NumberOfMotors
         else:
             self.MotorName_StringList = [""] * self.NumberOfMotors
@@ -1103,15 +1123,15 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
             InputNumber_ConvertedToFloat = float(InputNumber)
         except:
             exceptions = sys.exc_info()[0]
-            print("PassThrough0and1values_ExitProgramOtherwise Error. InputNumber must be a float value, Exceptions: %s" % exceptions, 0)
-            raw_input("Press any key to continue")
+            print("PassThrough0and1values_ExitProgramOtherwise Error. InputNumber must be a float value, Exceptions: %s" % exceptions)
+            input("Press any key to continue")
             sys.exit()
 
         try:
             if InputNumber_ConvertedToFloat == 0.0 or InputNumber_ConvertedToFloat == 1:
                 return InputNumber_ConvertedToFloat
             else:
-                raw_input("PassThrough0and1values_ExitProgramOtherwise Error. '" +
+                input("PassThrough0and1values_ExitProgramOtherwise Error. '" +
                           InputNameString +
                           "' must be 0 or 1 (value was " +
                           str(InputNumber_ConvertedToFloat) +
@@ -1120,8 +1140,8 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
                 sys.exit()
         except:
             exceptions = sys.exc_info()[0]
-            print("PassThrough0and1values_ExitProgramOtherwise Error, Exceptions: %s" % exceptions, 0)
-            raw_input("Press any key to continue")
+            print("PassThrough0and1values_ExitProgramOtherwise Error, Exceptions: %s" % exceptions)
+            input("Press any key to continue")
             sys.exit()
     #######################################################################################################################
 
@@ -1131,15 +1151,15 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
             InputNumber_ConvertedToFloat = float(InputNumber)
         except:
             exceptions = sys.exc_info()[0]
-            print("PassThroughFloatValuesInRange_ExitProgramOtherwise Error. InputNumber must be a float value, Exceptions: %s" % exceptions, 0)
-            raw_input("Press any key to continue")
+            print("PassThroughFloatValuesInRange_ExitProgramOtherwise Error. InputNumber must be a float value, Exceptions: %s" % exceptions)
+            input("Press any key to continue")
             sys.exit()
 
         try:
             if InputNumber_ConvertedToFloat >= RangeMinValue and InputNumber_ConvertedToFloat <= RangeMaxValue:
                 return InputNumber_ConvertedToFloat
             else:
-                raw_input("PassThroughFloatValuesInRange_ExitProgramOtherwise Error. '" +
+                input("PassThroughFloatValuesInRange_ExitProgramOtherwise Error. '" +
                           InputNameString +
                           "' must be in the range [" +
                           str(RangeMinValue) +
@@ -1151,8 +1171,8 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
                 sys.exit()
         except:
             exceptions = sys.exc_info()[0]
-            print("PassThroughFloatValuesInRange_ExitProgramOtherwise Error, Exceptions: %s" % exceptions, 0)
-            raw_input("Press any key to continue")
+            print("PassThroughFloatValuesInRange_ExitProgramOtherwise Error, Exceptions: %s" % exceptions)
+            input("Press any key to continue")
             sys.exit()
     #######################################################################################################################
 
@@ -1275,7 +1295,7 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
             except:
                 exceptions = sys.exc_info()[0]
-                self.MyPrint_WithoutLogFile("SerialReadLineWithTimeout ERROR: Exceptions: %s" % exceptions, 0)
+                self.MyPrint_WithoutLogFile("SerialReadLineWithTimeout ERROR: Exceptions: %s" % exceptions)
 
             if timeout != -1:  # IF THERE IS A TIMEOUT THAT'S SPECIFIED BY THE CALLING FUNCTION
                 if self.getPreciseSecondsTimeStampString() - entry_time < timeout:
@@ -1368,7 +1388,7 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
                 # MyPrint_WithoutLogFile("only_numerics: converted " + str(seq) + " to " + seq_numbers_only)
         except:
             exceptions = sys.exc_info()[0]
-            self.MyPrint_WithoutLogFile("only_numerics Error, Exceptions: %s" % exceptions, 0)
+            self.MyPrint_WithoutLogFile("only_numerics Error, Exceptions: %s" % exceptions)
             return ""
 
         return seq_numbers_only
@@ -1606,7 +1626,7 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
         except:
             exceptions = sys.exc_info()[0]
-            self.MyPrint_WithoutLogFile("UpdateFrequencyCalculation_RealTimeTicksMillisecDynamixel ERROR, exceptions: %s" % exceptions, 0)
+            self.MyPrint_WithoutLogFile("UpdateFrequencyCalculation_RealTimeTicksMillisecDynamixel ERROR, exceptions: %s" % exceptions)
             #traceback.print_exc()
     ##########################################################################################################
     ##########################################################################################################
@@ -2595,6 +2615,8 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
         self.InitializeAllMotors()
 
+        self.StartingTime_CalculatedFromMainThread = self.getPreciseSecondsTimeStampString()
+
         #############################################################################################################################################
         #############################################################################################################################################
         #############################################################################################################################################
@@ -2602,7 +2624,7 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
             ##############################################################################################
             ##############################################################################################
-            self.CurrentTime_CalculatedFromMainThread = self.getPreciseSecondsTimeStampString()
+            self.CurrentTime_CalculatedFromMainThread = self.getPreciseSecondsTimeStampString() - self.StartingTime_CalculatedFromMainThread
             ##############################################################################################
             ##############################################################################################
 
@@ -2718,7 +2740,7 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
                 except:
                     exceptions = sys.exc_info()[0]
-                    self.MyPrint_WithoutLogFile("MainThread GETS, exceptions: %s" % exceptions, 0)
+                    self.MyPrint_WithoutLogFile("MainThread GETS, exceptions: %s" % exceptions)
                     traceback.print_exc()
             ##############################################################################################
             ############################################################################################## End GETs
@@ -2932,7 +2954,7 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
                 except:
                     exceptions = sys.exc_info()[0]
-                    self.MyPrint_WithoutLogFile("MainThread SETS, exceptions: %s" % exceptions, 0)
+                    self.MyPrint_WithoutLogFile("MainThread SETS, exceptions: %s" % exceptions)
                     traceback.print_exc()
             ##############################################################################################
             ##############################################################################################  End SETs
@@ -2957,9 +2979,6 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
 
         self.EXIT_PROGRAM_FLAG = 1
 
-        if self.RootIsOwnedExternallyFlag == 0: #This class object owns root and must handle it properly
-            self.root.quit()  # Stop the GUI thread
-            self.root.destroy()  # Close down the GUI thread
     ##########################################################################################################
     ##########################################################################################################
 
@@ -3007,7 +3026,8 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
                           padx = self.GUI_PADX,
                           pady = self.GUI_PADY,
                           rowspan = self.GUI_ROWSPAN,
-                          columnspan= self.GUI_COLUMNSPAN)
+                          columnspan= self.GUI_COLUMNSPAN,
+                          sticky = self.GUI_STICKY)
         ########################
 
         ##############################################################################################################
@@ -3412,6 +3432,12 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
             self.root.mainloop()
         else:
             self.GUI_ready_to_be_updated_flag = 1
+        ########################
+
+        ########################
+        if self.RootIsOwnedExternallyFlag == 0: #This class object owns root and must handle it properly
+            self.root.quit()  # Stop the GUI thread, MUST BE CALLED FROM GUI_Thread
+            self.root.destroy()  # Close down the GUI thread, MUST BE CALLED FROM GUI_Thread
         ########################
 
     ##########################################################################################################
