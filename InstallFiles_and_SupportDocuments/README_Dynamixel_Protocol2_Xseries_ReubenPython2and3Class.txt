@@ -1,21 +1,30 @@
-########################  
-Reuben Brewer
+########################
+Dynamixel_Protocol2_Xseries_ReubenPython2and3Class
+
+Wrapper (including ability to hook to Tkinter GUI) to control Dynamixel motors that use Protocol 2 (X series and possibly some other series).
+
+Reuben Brewer, Ph.D.
+
 reuben.brewer@gmail.com
+
 www.reubotics.com
 
 Apache 2 License
 
-Software Revision C, 05/28/2021
+Software Revision D, 03/13/2022
 
-Verified working on: 
-Python 2.7 and 3.7.
-Windows 8.1 64-bit
-Raspberry Pi Buster 
+Verified working on:
+Python 2.7, 3.8.
+Windows 8.1, 10 64-bit
+Raspberry Pi Buster
 (no Mac testing yet)
 
 This code works ONLY for Dynamixel's Protocol 2 (X series and possibly some other series).
 
 To use this code, you'll need to find the unique Serial Number for your U2D2, following the instructions in the included image "FindingTheSerialNumberOfU2D2inWindows.png".
+When instantiating the class obect via Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(DYNAMIXEL_X_setup_dict),
+EACH INPUT LIST MUST BE THE SAME LENGTH AS THE NUMBER OF MOTORS, AND
+EACH MOTOR'S NUMERICAL ID MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
 
 You will also need to configure your Dynamixel motor (including Motor ID and Baud Rate) within R+Manager.exe (downloaded from the Robotis website).
 Note that there is another interface from Robotis (Dynamixel Wizard 2.0) for Protocol 2 motors, but I have not yet tested if it works with Protocol 2 motors.
@@ -87,8 +96,7 @@ Add the lines:
     
 	from . import _ftd2xx_linux as _ft"
 right before the linux2 line (otherwise it breaks when run in Python 3).
-Alternatively, you can copy Reuben's version of this file (ftd2xx_ReubenModified.py) to /usr/local/lib/python3.7/dist-packages/ftd2xx/ftd2xx.py
-.
+Alternatively, you can copy Reuben's version of this file (ftd2xx_ReubenModified.py) to /usr/local/lib/python3.7/dist-packages/ftd2xx/ftd2xx.py.
 #######
 
 To install the driver:
@@ -103,9 +111,7 @@ cp libftd2xx.* /usr/local/lib
 chmod 0755 /usr/local/lib/libftd2xx.so.1.4.6
 ln -sf /usr/local/lib/libftd2xx.so.1.4.6 /usr/local/lib/libftd2xx.so
 exit
-THIS LAST STEP ISN’T IN THE READ ME BUT IS CRITICAL: “sudo ldconfig” so that your code can find the new library.
+THIS LAST STEP ISN'T IN THE READ ME BUT IS CRITICAL: 'sudo ldconfig' so that your code can find the new library.
 ###
-
-
 
 ########################### 
