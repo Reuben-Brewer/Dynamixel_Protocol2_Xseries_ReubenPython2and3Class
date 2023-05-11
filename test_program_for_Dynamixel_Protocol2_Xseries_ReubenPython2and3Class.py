@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision D, 03/13/2022
+Software Revision E, 05/10/2023
 
 Verified working on: Python 2.7, 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -279,7 +279,7 @@ if __name__ == '__main__':
     DYNAMIXEL_X_OPEN_FLAG = -1
 
     global DynamixelList_TestChannelsList
-    DynamixelList_TestChannelsList = [0] #Set this list to whichever motor ID's you want to test.
+    DynamixelList_TestChannelsList = [1, 2] #Set this list to whichever motor ID's you want to test.
 
     global Dynamixel_Protocol2_Xseries_ReubenPython2and3ClassObject_MostRecentRxMessageDict
 

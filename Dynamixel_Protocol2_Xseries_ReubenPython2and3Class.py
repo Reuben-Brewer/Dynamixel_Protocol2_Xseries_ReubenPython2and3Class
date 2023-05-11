@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision D, 03/13/2022
+Software Revision E, 05/10/2023
 
 Verified working on: Python 2.7, 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -2986,9 +2986,11 @@ class Dynamixel_Protocol2_Xseries_ReubenPython2and3Class(Frame): #Subclass the T
     ##########################################################################################################
     def StartGUI(self, GuiParent=None):
 
-        GUI_Thread_ThreadingObject = threading.Thread(target=self.GUI_Thread, args=(GuiParent,))
-        GUI_Thread_ThreadingObject.setDaemon(True) #Should mean that the GUI thread is destroyed automatically when the main thread is destroyed.
-        GUI_Thread_ThreadingObject.start()
+        #GUI_Thread_ThreadingObject = threading.Thread(target=self.GUI_Thread, args=(GuiParent,))
+        #GUI_Thread_ThreadingObject.setDaemon(True) #Should mean that the GUI thread is destroyed automatically when the main thread is destroyed.
+        #GUI_Thread_ThreadingObject.start()
+
+        self.GUI_Thread(GuiParent)
     ##########################################################################################################
     ##########################################################################################################
 
