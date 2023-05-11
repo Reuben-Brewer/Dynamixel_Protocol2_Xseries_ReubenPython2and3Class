@@ -12,7 +12,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision D, 03/13/2022
+Software Revision E, 05/10/2023
 
 Verified working on:
 
@@ -50,6 +50,18 @@ you won't be able to receive any updates from motors (but the motors themselves 
 ########################### Installation instructions
 
 This code isn't "installed" like a typical python module (no "pip install MyModule"). If you want to call it in your own code, you'll need to import a local copy of the files.
+
+###
+
+Dynamixel_Protocol2_Xseries_ReubenPython2and3Class, ListOfModuleDependencies: ['dynamixel_sdk', 'ftd2xx', 'future.builtins', 'numpy', 'serial', 'serial.tools']
+
+Dynamixel_Protocol2_Xseries_ReubenPython2and3Class, ListOfModuleDependencies_TestProgram: ['future.builtins', 'MyPrint_ReubenPython2and3Class']
+
+Dynamixel_Protocol2_Xseries_ReubenPython2and3Class, ListOfModuleDependencies_NestedLayers: ['future.builtins']
+
+Dynamixel_Protocol2_Xseries_ReubenPython2and3Class, ListOfModuleDependencies_All:['dynamixel_sdk', 'ftd2xx', 'future.builtins', 'MyPrint_ReubenPython2and3Class', 'numpy', 'serial', 'serial.tools']
+
+###
 
 ###
 
