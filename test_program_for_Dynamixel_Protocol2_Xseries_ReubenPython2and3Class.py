@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision E, 05/10/2023
+Software Revision F, 07/18/2023
 
 Verified working on: Python 2.7, 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -189,10 +189,10 @@ if __name__ == '__main__':
     USE_MYPRINT_FLAG = 1
     
     global USE_DYNAMIXEL_POSITION_CONTROL_FLAG
-    USE_DYNAMIXEL_POSITION_CONTROL_FLAG = 1 #SET TO 0 FOR VELOCITY CONTROL
+    USE_DYNAMIXEL_POSITION_CONTROL_FLAG = 0 #SET TO 0 FOR VELOCITY CONTROL
 
     global USE_DYNAMIXEL_SINUSOIDAL_INPUT_FLAG
-    USE_DYNAMIXEL_SINUSOIDAL_INPUT_FLAG = 1
+    USE_DYNAMIXEL_SINUSOIDAL_INPUT_FLAG = 0
     #################################################
     #################################################
 
@@ -336,19 +336,22 @@ if __name__ == '__main__':
 
     global DYNAMIXEL_X_setup_dict
     DYNAMIXEL_X_setup_dict = dict([("SerialNumber", "FT3M9STOA"), #Change to the serial number of your unique device
-                                    ("NameForU2D2UserProvided", "Example Name U2D2"),
-                                    ("SerialBaudRate", 4000000),
-                                    ("ENABLE_GETS", 1),
-                                    ("ENABLE_SETS", 1),
-                                    ("MainThread_TimeToSleepEachLoop", 0.002),
-                                    ("MotorType_StringList", ["XM540-W270-R"]*len(DynamixelList_TestChannelsList)), #EACH INPUT LIST MUST BE THE SAME LENGTH AS NUMBER OF MOTORS.
-                                    ("ControlType_StartingValueList", ["CurrentBasedPositionControl"]*len(DynamixelList_TestChannelsList)), #MOTOR ID'S MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
-                                    ("Position_Deg_StartingValueList", [150.0]*len(DynamixelList_TestChannelsList)),
-                                    ("Position_Deg_min", [0.0]*len(DynamixelList_TestChannelsList)),
-                                    ("Position_Deg_max", [300.0]*len(DynamixelList_TestChannelsList)),
-                                    ("Current_Percent0to1_max", [0.5]*len(DynamixelList_TestChannelsList)),
-                                    ("StartEngagedFlag", [1]*len(DynamixelList_TestChannelsList)),
-                                    ("GUIparametersDict", DYNAMIXEL_X_GUIparametersDict)])
+                                ("NameForU2D2UserProvided", "Example Name U2D2"),
+                                ("SerialBaudRate", 4000000),
+                                ("ENABLE_GETS", 1),
+                                ("ENABLE_SETS", 1),
+                                ("MainThread_TimeToSleepEachLoop", 0.002),
+                                ("MotorType_StringList", ["XM540-W270-R"]*len(DynamixelList_TestChannelsList)), #EACH INPUT LIST MUST BE THE SAME LENGTH AS NUMBER OF MOTORS.
+                                ("ControlType_StartingValueList", ["VelocityControl"]*len(DynamixelList_TestChannelsList)), #MOTOR ID'S MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
+                                ("Position_Deg_StartingValueList", [150.0]*len(DynamixelList_TestChannelsList)),
+                                ("Position_Deg_min", [0.0]*len(DynamixelList_TestChannelsList)),
+                                ("Position_Deg_max", [300.0]*len(DynamixelList_TestChannelsList)),
+                                ("Velocity_DynamixelUnits_StartingValueList", [0.0] * len(DynamixelList_TestChannelsList)),
+                                ("Velocity_DynamixelUnits_min", [0.0] * len(DynamixelList_TestChannelsList)),
+                                ("Velocity_DynamixelUnits_max", [60.0] * len(DynamixelList_TestChannelsList)),
+                                ("Current_Percent0to1_max", [0.5]*len(DynamixelList_TestChannelsList)),
+                                ("StartEngagedFlag", [1]*len(DynamixelList_TestChannelsList)),
+                                ("GUIparametersDict", DYNAMIXEL_X_GUIparametersDict)])
 
                             #("RxThread_TimeToSleepEachLoop", 0.001),
                             #("TxThread_TimeToSleepEachLoop", 0.001),
